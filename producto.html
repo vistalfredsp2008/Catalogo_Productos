@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalle del Producto</title>
+  <link rel="stylesheet" href="estilos.css">
+  <link rel="stylesheet" href="producto-detalle.css">
+</head>
+<body>
+
+  <!-- Encabezado con Buscador y Carrito -->
+  <header class="header">
+    <div class="header-container">
+      
+      <!-- Buscador en tiempo real -->
+      <input type="text" id="buscador" placeholder="Buscar productos, marcas y más...">
+      
+      <!-- Botón para abrir el carrito -->
+      <div class="carrito-icon" title="Ver carrito">
+        🛒 <span id="cart-count">0</span>
+      </div>
+    </div>
+
+    <!-- Menú Dinámico de Categorías con Logo al Lado Izquierdo -->
+    <nav class="categories-nav">
+      <div class="categories-wrapper">
+        
+        <!-- LOGO UBICADO AL LADO IZQUIERDO DE LAS CATEGORÍAS -->
+        <a href="index.html" class="logo-link" title="Ir al inicio">
+          <div class="logo-wrapper">
+            <img src="img/logo.png" alt="Mi Catálogo" class="logo-img"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <span class="logo-text-fallback">Mi Catálogo</span>
+          </div>
+        </a>
+
+        <!-- MENÚ DE CATEGORÍAS -->
+        <div class="categories-container" id="categories-menu">
+          <!-- Generado dinámicamente desde JS -->
+        </div>
+
+      </div>
+    </nav>
+  </header>
+
+  <!-- Contenedor Principal del Detalle -->
+  <main class="main-container">
+    <div class="product-detail-container" id="product-detail">
+      <p style="text-align: center; padding: 40px;">Cargando información del producto...</p>
+    </div>
+
+    <!-- Sección de Productos Relacionados -->
+    <section class="section-vistos" id="section-relacionados" style="display: none; margin-top: 40px;">
+      <h2 class="section-title">Productos relacionados</h2>
+      <div class="carousel-wrapper">
+        <button class="carousel-btn prev-btn" id="btn-prev-relacionados">&#10094;</button>
+        
+        <div class="carousel-container" id="carousel-relacionados">
+          <div class="grid-vistos" id="grid-relacionados">
+            <!-- Tarjetas generadas dinámicamente -->
+          </div>
+        </div>
+
+        <button class="carousel-btn next-btn" id="btn-next-relacionados">&#10095;</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Pie de Página (Footer) -->
+  <footer class="footer">
+  <div class="footer-container">
+    <div class="footer-col">
+      <h3>Mi Catálogo</h3>
+      <p id="direccion-tienda">Holcá, Yucatán, México</p>
+      <p>Ventas de mayoreo y menudeo con envíos y entregas coordinadas directamente por WhatsApp.</p>
+    </div>
+    
+    <div class="footer-col">
+      <h3>Redes Sociales</h3>
+      <ul class="footer-links">
+        <li><a href="https://facebook.com" target="_blank" class="btn-fb">Facebook</a></li>
+        <li><a href="https://instagram.com" target="_blank" class="btn-ig">Instagram</a></li>
+        <li><a href="https://wa.me/529990000000" target="_blank">WhatsApp Directo</a></li>
+      </ul>
+    </div>
+
+    <!-- NUEVA COLUMNA PARA MOSTRAR EL MAPA EN VIVO -->
+    <div class="footer-col" id="columna-mapa" style="display: none;">
+      <h3>Ubicación</h3>
+      <div style="width: 100%; height: 160px; border-radius: 8px; overflow: hidden; margin-top: 8px;">
+        <iframe id="mapa-iframe" src="" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+      </div>
+    </div>
+  </div>
+  
+  <div class="footer-bottom">
+    <p>&copy; 2026 Mi Catálogo Digital - Todos los derechos reservados.</p>
+  </div>
+</footer>
+
+  <!-- MODAL LIGHTBOX PANTALLA COMPLETA -->
+  <div id="lightbox-modal" class="lightbox-modal">
+    <span class="lightbox-close" id="lightbox-close">&times;</span>
+    <button class="lightbox-btn prev-lightbox" id="btn-lightbox-prev">&#10094;</button>
+    <div class="lightbox-content">
+      <img id="lightbox-img" src="" alt="Vista ampliada">
+    </div>
+    <button class="lightbox-btn next-lightbox" id="btn-lightbox-next">&#10095;</button>
+  </div>
+
+  <!-- Modal del Carrito -->
+  <div id="cart-modal" class="cart-modal">
+    <div class="cart-content">
+      <div class="cart-header">
+        <h3>Tu Pedido</h3>
+        <button id="close-cart" class="close-btn">&times;</button>
+      </div>
+      
+      <div id="cart-items" class="cart-items">
+        <p class="empty-msg">El carrito está vacío.</p>
+      </div>
+
+      <div class="cart-footer">
+        <div class="total-row">
+          <span>Total Estimado:</span>
+          <span id="cart-total" class="total-price">$0</span>
+        </div>
+        <button id="btn-whatsapp" class="btn-whatsapp" disabled>
+          Enviar pedido por WhatsApp 📲
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="producto-detalle.js"></script>
+</body>
+</html>

@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel de Administración - Catálogo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin-estilos.css">
+  <style>
+    /* Estilos para el Editor Enriquecido */
+    .editor-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      background: #f3f4f6;
+      border: 1px solid #ccc;
+      border-bottom: none;
+      padding: 6px;
+      border-top-left-radius: 6px;
+      border-top-right-radius: 6px;
+    }
+    .editor-btn {
+      background: #ffffff;
+      border: 1px solid #d1d5db;
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      color: #374151;
+    }
+    .editor-btn:hover { background: #e5e7eb; }
+    .editor-select {
+      background: #ffffff;
+      border: 1px solid #d1d5db;
+      border-radius: 4px;
+      padding: 4px 6px;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+    .rich-editor {
+      min-height: 120px;
+      max-height: 220px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      border-bottom-left-radius: 6px;
+      border-bottom-right-radius: 6px;
+      padding: 10px;
+      background: #ffffff;
+      line-height: 1.5;
+    }
+    .rich-editor:focus { outline: 2px solid #3483fa; }
+    .color-picker-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .color-picker-group input[type="color"] {
+      width: 40px;
+      height: 38px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      cursor: pointer;
+      padding: 2px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Encabezado Superior -->
+  <header class="admin-header">
+    <div class="container header-content">
+      <div class="brand">
+        <div class="brand-icon">⚙️</div>
+        <div>
+          <h1>Panel de Control</h1>
+          <p class="brand-subtitle">Gestión de Catálogo e Inventario</p>
+        </div>
+      </div>
+      <span class="badge-status">● Modo Local (Offline)</span>
+    </div>
+  </header>
+
+  <main class="container" style="display: flex; flex-direction: column; gap: 24px; padding-top: 20px; padding-bottom: 40px;">
+    
+    <!-- SECCIÓN SUPERIOR 1: FORMULARIO PRINCIPAL DE AGREGAR PRODUCTO -->
+    <section class="card-panel" style="border-top: 4px solid #3483fa;">
+      <div class="card-header">
+        <h2 id="form-title">➕ Agregar Nuevo Producto</h2>
+        <p class="card-subtitle">Completa los datos e imágenes de tu producto para agregarlo al catálogo</p>
+      </div>
+      
+      <form id="form-producto">
+        <input type="hidden" id="prod-id">
+
+        <div class="form-row">
+          <div class="form-group" style="flex: 2;">
+            <label for="nombre">Nombre del Producto</label>
+            <input type="text" id="nombre" required placeholder="Ej. Taza Mágica Sublimada 11oz">
+          </div>
+
+          <div class="form-group" style="flex: 1;">
+            <label for="categoria">Categoría</label>
+            <select id="categoria" required style="width: 100%; padding: 10px 12px; border: 1px solid #ccc; border-radius: 6px; background: #f9fafb; font-size: 0.9rem;">
+              <option value="">-- Selecciona categoría --</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- SELECTOR DE IMÁGENES CON VISTA PREVIA -->
+        <div class="form-group">
+          <label>Imágenes del Producto</label>
+          <label for="input-prod-files" class="btn btn-outline" style="cursor: pointer; text-align: center; display: block; border: 2px dashed #3483fa; margin-bottom: 8px;">
+            📷 Seleccionar Fotos del Producto (Puedes elegir varias)
+          </label>
+          <input type="file" id="input-prod-files" accept="image/*" multiple style="display: none;">
+          
+          <div id="producto-imgs-preview" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; min-height: 45px; border: 1px dashed #ccc; padding: 8px; border-radius: 6px; background: #fafafa;">
+            <small style="color: #888; width: 100%; text-align: center;">No hay imágenes cargadas aún.</small>
+          </div>
+          <small class="help-text">La primera imagen de la lista se usará como portada.</small>
+        </div>
+
+        <!-- DESCRIPCIÓN CON EDITOR ENRIQUECIDO -->
+        <div class="form-group">
+          <label>Descripción Detallada</label>
+          <div class="editor-toolbar">
+            <button type="button" class="editor-btn" onclick="execCmd('bold')" title="Negrita"><b>B</b></button>
+            <button type="button" class="editor-btn" onclick="execCmd('underline')" title="Subrayado"><u>U</u></button>
+            <button type="button" class="editor-btn" onclick="execCmd('insertUnorderedList')" title="Viñetas">• Lista</button>
+            <select class="editor-select" onchange="execCmd('fontSize', this.value); this.value='';" title="Tamaño de Letra">
+              <option value="">Tamaño...</option>
+              <option value="2">Pequeño</option>
+              <option value="3">Normal</option>
+              <option value="4">Grande</option>
+              <option value="5">Encabezado</option>
+            </select>
+            <button type="button" class="editor-btn" onclick="execCmd('removeFormat')" title="Limpiar Formato">🧹 Limpiar</button>
+          </div>
+          <div id="editor-descripcion" class="rich-editor" contenteditable="true" placeholder="Escribe características, dimensiones, técnicas de personalización o pega texto directamente..."></div>
+        </div>
+
+        <!-- PRECIOS -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="precio_menudeo">Precio Menudeo ($)</label>
+            <input type="number" id="precio_menudeo" step="0.01" required placeholder="90.00">
+          </div>
+          <div class="form-group">
+            <label for="precio_mayoreo">Precio Mayoreo ($) <small style="color:#6b7280;">(Opcional)</small></label>
+            <input type="number" id="precio_mayoreo" step="0.01" placeholder="55.00">
+          </div>
+          <div class="form-group">
+            <label for="min_mayoreo">Mínimo Mayoreo <small style="color:#6b7280;">(Opcional)</small></label>
+            <input type="number" id="min_mayoreo" placeholder="12">
+          </div>
+        </div>
+
+        <div class="form-group toggle-group">
+          <label class="toggle-switch">
+            <input type="checkbox" id="en_oferta">
+            <span class="slider"></span>
+          </label>
+          <span class="toggle-label">¿Producto en Oferta Especial?</span>
+        </div>
+
+        <div class="form-group" id="group-precio-oferta" style="display: none;">
+          <label for="precio_oferta">Precio de Oferta ($)</label>
+          <input type="number" id="precio_oferta" step="0.01" placeholder="75.00">
+        </div>
+
+        <div class="form-actions" style="margin-top: 15px;">
+          <button type="submit" id="btn-guardar" class="btn btn-primary" style="padding: 12px 24px; font-size: 1rem;">💾 Guardar Producto</button>
+          <button type="button" id="btn-cancelar" class="btn btn-secondary" style="display: none;">Cancelar Edición</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- SECCIÓN INTERMEDIA: TABLA DE PRODUCTOS REGISTRADOS -->
+    <section class="card-panel">
+      <div class="table-header-row">
+        <div>
+          <h2>📦 Productos Registrados</h2>
+          <p class="card-subtitle">Listado completo de artículos en tu catálogo</p>
+        </div>
+        <button id="btn-exportar" class="btn btn-outline" style="background: #10b981; color: white; border: none; font-weight: bold;">📥 Exportar JSON</button>
+      </div>
+
+      <div class="table-responsive">
+        <table class="tabla-productos">
+          <thead>
+            <tr>
+              <th>Portada</th>
+              <th>Información</th>
+              <th>Menudeo</th>
+              <th>Mayoreo</th>
+              <th>Oferta</th>
+              <th style="text-align: right;">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-body">
+            <!-- Filas dinámicas generadas desde JS -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SECCIÓN INFERIOR: CONFIGURACIÓN GENERAL, APARIENCIA, REDES, VIDEO Y UBICACIÓN -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
+
+      <!-- TARJETA A: APARIENCIA Y FORMATO DE LA WEB -->
+      <section class="card-panel">
+        <div class="card-header">
+          <h2>🎨 Diseño y Formato Web</h2>
+          <p class="card-subtitle">Personaliza colores y tamaño del logo</p>
+        </div>
+        <form id="form-apariencia">
+          <div class="form-group">
+            <label for="logo-height">Tamaño / Alto del Logo: <b id="logo-height-val">50px</b></label>
+            <input type="range" id="logo-height" min="30" max="120" value="50" style="width: 100%;">
+          </div>
+
+          <div class="form-group">
+            <label>Color Principal (Encabezado y Botones)</label>
+            <div class="color-picker-group">
+              <input type="color" id="color-principal" value="#ffffff">
+              <span id="color-principal-hex">#ffffff</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Color Texto Encabezado</label>
+            <div class="color-picker-group">
+              <input type="color" id="color-header-text" value="#1e293b">
+              <span id="color-header-text-hex">#1e293b</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Color Sección Redes (Inferior)</label>
+            <div class="color-picker-group">
+              <input type="color" id="color-secundario" value="#1e293b">
+              <span id="color-secundario-hex">#1e293b</span>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-outline" style="width: 100%;">💾 Guardar Diseño y Apariencia</button>
+        </form>
+      </section>
+
+      <!-- TARJETA B: WHATSAPP, VIDEO, REDES SOCIALES Y UBICACIÓN -->
+      <section class="card-panel">
+        <div class="card-header">
+          <h2>📍 Contacto, Video y Redes</h2>
+          <p class="card-subtitle">Actualiza el video de YouTube, WhatsApp y redes sociales</p>
+        </div>
+        <form id="form-contacto">
+          <div class="form-group">
+            <label for="tel-whatsapp">Número de WhatsApp (Con LADA)</label>
+            <input type="text" id="tel-whatsapp" placeholder="Ej: 529991234567" required>
+            <small class="help-text">Sin espacios ni signo +.</small>
+          </div>
+
+          <div class="form-group">
+            <label for="url-video">URL Video Destacado (YouTube)</label>
+            <input type="text" id="url-video" placeholder="Ej: https://www.youtube.com/watch?v=...">
+            <small class="help-text">Pega el enlace normal o embed de YouTube.</small>
+          </div>
+
+          <div class="form-group">
+            <label for="url-facebook">Página de Facebook URL</label>
+            <input type="text" id="url-facebook" placeholder="Ej: https://www.facebook.com/tu-pagina">
+          </div>
+
+          <div class="form-group">
+            <label for="direccion-texto">Dirección Física / Ubicación</label>
+            <input type="text" id="direccion-texto" placeholder="Ej. Calle 20 #100 x 15 y 17, Centro, Holcá, Yucatán">
+          </div>
+
+          <div class="form-group">
+            <label for="mapa-embed">Enlace Embed Google Maps (Iframe URL)</label>
+            <input type="text" id="mapa-embed" placeholder="https://www.google.com/maps/embed?pb=...">
+          </div>
+
+          <button type="submit" class="btn btn-outline" style="width: 100%;">💾 Guardar Datos y Redes</button>
+        </form>
+      </section>
+
+      <!-- TARJETA C: BANNERS Y CATEGORÍAS -->
+      <section class="card-panel">
+        <div class="card-header">
+          <h2>🖼️ Banners y Categorías</h2>
+          <p class="card-subtitle">Gestión de portadas y etiquetas</p>
+        </div>
+
+        <div class="form-group">
+          <label>Categorías Registradas</label>
+          <form id="form-categoria" style="display: flex; gap: 8px; margin-bottom: 8px;">
+            <input type="text" id="nueva-categoria" placeholder="Nueva categoría..." required style="flex: 1;">
+            <button type="submit" class="btn btn-primary" style="padding: 6px 12px; flex: none;">+ Añadir</button>
+          </form>
+          <div id="lista-categorias-tags" style="display: flex; flex-wrap: wrap; gap: 6px;"></div>
+        </div>
+
+        <hr style="margin: 15px 0; border: none; border-top: 1px solid #eee;">
+
+        <div class="form-group">
+          <label for="input-banner-file" class="btn btn-outline" style="cursor: pointer; text-align: center; display: block; border: 2px dashed #3483fa;">
+            📁 Seleccionar Banners desde PC
+          </label>
+          <input type="file" id="input-banner-file" accept="image/*" multiple style="display: none;">
+          <div id="lista-banners-preview" style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px;"></div>
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+
+  <script src="admin-app.js"></script>
+</body>
+</html>
