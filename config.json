@@ -1,0 +1,16 @@
+{
+  "contacto": {
+    "whatsapp": "529991350817",
+    "direccion": "Holcá, Yucatán, México",
+    "mapaUrl": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d932.702764680163!2d-88.92843943139763!3d20.758482056168493!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8f56b7cb0e9bb591%3A0x6f635e2f01c5ea90!2zVGllbmRhIFNpeCDigJxTL07igJ0!5e0!3m2!1ses-419!2smx!4v1790210868951!5m2!1ses-419!2smx",
+    "videoUrl": "https://www.youtube.com/embed/uhqFMesRAzw&list=RDuhqFMesRAzw&start_radio=1",
+    "facebookUrl": "https://www.facebook.com/profile.php?id=61561437302839",
+    "instagramUrl": "https://instagram.com"
+  },
+  "apariencia": {
+    "logoHeight": "68",
+    "colorPrincipal": "#f500b4",
+    "colorHeaderTexto": "#1e293b",
+    "colorSecundario": "#1e293b"
+  }
+}
