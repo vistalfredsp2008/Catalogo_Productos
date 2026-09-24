@@ -16,8 +16,8 @@ let TELEFONO_WHATSAPP = "529990000000";
 // ==========================================
 document.addEventListener("DOMContentLoaded", async () => {
 
-  // 1. Aplicar Personalización de Apariencia, WhatsApp y Ubicación
-  aplicarConfiguracionPersonalizada();
+  // 1. Aplicar Personalización de Apariencia, WhatsApp y Ubicación (lectura de config.json con anticaché)
+  await aplicarConfiguracionPersonalizada();
 
   // 2. Cargar Banners Promocionales
   const bannersGuardados = localStorage.getItem("mis_banners_admin");
@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     todosLosProductos = JSON.parse(productosGuardados);
   } else {
     try {
-      const res = await fetch("productos.json");
+      const res = await fetch("productos.json?v=" + new Date().getTime());
       if (res.ok) {
         todosLosProductos = await res.json();
       }
@@ -74,88 +74,108 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
-function aplicarConfiguracionPersonalizada() {
+async function aplicarConfiguracionPersonalizada() {
+  let configContacto = null;
+  let configApariencia = null;
+
+  // Intentar cargar la configuración remota desde config.json evitando la caché
+  try {
+    const res = await fetch("config.json?v=" + new Date().getTime());
+    if (res.ok) {
+      const configGeneral = await res.json();
+      configContacto = configGeneral.contacto;
+      configApariencia = configGeneral.apariencia;
+    }
+  } catch (e) {
+    console.warn("No se pudo cargar config.json, recurriendo a localStorage local:", e);
+  }
+
+  // Fallback a localStorage (útil para pruebas inmediatas en el entorno admin local)
+  if (!configContacto) {
+    const contactoStr = localStorage.getItem("mi_config_contacto_admin");
+    configContacto = contactoStr ? JSON.parse(contactoStr) : {
+      whatsapp: "529990000000",
+      direccion: "Holcá, Yucatán, México",
+      mapaUrl: "",
+      videoUrl: "",
+      facebookUrl: ""
+    };
+  }
+
+  if (!configApariencia) {
+    const aparienciaStr = localStorage.getItem("mi_config_apariencia_admin");
+    configApariencia = aparienciaStr ? JSON.parse(aparienciaStr) : {
+      logoHeight: 48,
+      colorPrincipal: "#9acd32",
+      colorHeaderTexto: "#2d3277"
+    };
+  }
+
   // A. Cargar Datos de Contacto, Ubicación, Mapa, Video y Redes
-  const contactoStr = localStorage.getItem("mi_config_contacto_admin");
+  if (configContacto) {
+    if (configContacto.whatsapp) {
+      TELEFONO_WHATSAPP = configContacto.whatsapp;
+    }
 
-  // Valores por defecto si no existen en el localStorage del usuario
-  const config = contactoStr ? JSON.parse(contactoStr) : {
-    whatsapp: "529990000000",
-    direccion: "Holcá, Yucatán, México",
-    mapaUrl: "",
-    videoUrl: "",
-    facebookUrl: ""
-  };
+    const direccionElemento = document.getElementById("direccion-tienda");
+    if (direccionElemento && configContacto.direccion) {
+      direccionElemento.textContent = configContacto.direccion;
+    }
 
-  if (config.whatsapp) {
-    TELEFONO_WHATSAPP = config.whatsapp;
-  }
+    // Cargar Mapa de Google
+    const iframeMapa = document.getElementById("mapa-iframe");
+    const colMapa = document.getElementById("columna-mapa");
+    if (configContacto.mapaUrl && iframeMapa && colMapa) {
+      iframeMapa.src = configContacto.mapaUrl;
+      colMapa.style.display = "block";
+    }
 
-  const direccionElemento = document.getElementById("direccion-tienda");
-  if (direccionElemento && config.direccion) {
-    direccionElemento.textContent = config.direccion;
-  }
+    // Cargar Video de YouTube
+    const iframeVideo = document.getElementById("video-iframe");
+    const colVideo = document.getElementById("columna-video");
+    if (configContacto.videoUrl && iframeVideo && colVideo) {
+      iframeVideo.src = configContacto.videoUrl;
+      colVideo.style.display = "block";
+    }
 
-  // Cargar Mapa de Google
-  const iframeMapa = document.getElementById("mapa-iframe");
-  const colMapa = document.getElementById("columna-mapa");
-  if (config.mapaUrl && iframeMapa && colMapa) {
-    iframeMapa.src = config.mapaUrl;
-    colMapa.style.display = "block";
-  }
-
-  // Cargar Video de YouTube
-  const iframeVideo = document.getElementById("video-iframe");
-  const colVideo = document.getElementById("columna-video");
-  if (config.videoUrl && iframeVideo && colVideo) {
-    iframeVideo.src = config.videoUrl;
-    colVideo.style.display = "block";
-  }
-
-  // Cargar Enlace de Facebook
-  const linkFb = document.querySelector(".btn-fb");
-  if (linkFb && config.facebookUrl) {
-    linkFb.href = config.facebookUrl;
+    // Cargar Enlace de Facebook
+    const linkFb = document.querySelector(".btn-fb");
+    if (linkFb && configContacto.facebookUrl) {
+      linkFb.href = configContacto.facebookUrl;
+    }
   }
 
   // B. Cargar Configuración de Apariencia (Logo, Header y Carrito)
-  const aparienciaStr = localStorage.getItem("mi_config_apariencia_admin");
+  if (configApariencia) {
+    // Alto del Logo
+    const logoImg = document.querySelector(".logo-img");
+    if (logoImg && configApariencia.logoHeight) {
+      logoImg.style.maxHeight = `${configApariencia.logoHeight}px`;
+    }
 
-  // Valores por defecto de apariencia si no existen en el localStorage
-  const ap = aparienciaStr ? JSON.parse(aparienciaStr) : {
-    logoHeight: 48,
-    colorPrincipal: "#9acd32", // Reemplaza por tu color Hexadecimal si usas otro
-    colorHeaderTexto: "#2d3277"
-  };
+    // Color Principal del Encabezado Principal
+    const header = document.querySelector(".header");
+    if (header && configApariencia.colorPrincipal) {
+      header.style.backgroundColor = configApariencia.colorPrincipal;
+    }
 
-  // Alto del Logo
-  const logoImg = document.querySelector(".logo-img");
-  if (logoImg && ap.logoHeight) {
-    logoImg.style.maxHeight = `${ap.logoHeight}px`;
-  }
+    // Color Texto del Encabezado Principal
+    if (header && configApariencia.colorHeaderTexto) {
+      header.style.color = configApariencia.colorHeaderTexto;
+      const links = header.querySelectorAll("a, span, button");
+      links.forEach(l => l.style.color = configApariencia.colorHeaderTexto);
+    }
 
-  // Color Principal del Encabezado Principal
-  const header = document.querySelector(".header");
-  if (header && ap.colorPrincipal) {
-    header.style.backgroundColor = ap.colorPrincipal;
-  }
+    // Color Personalizado para la barra superior del Carrito Modal
+    const cartHeader = document.querySelector(".cart-header");
+    if (cartHeader && configApariencia.colorPrincipal) {
+      cartHeader.style.backgroundColor = configApariencia.colorPrincipal;
+    }
 
-  // Color Texto del Encabezado Principal
-  if (header && ap.colorHeaderTexto) {
-    header.style.color = ap.colorHeaderTexto;
-    const links = header.querySelectorAll("a, span, button");
-    links.forEach(l => l.style.color = ap.colorHeaderTexto);
-  }
-
-  // Color Personalizado para la barra superior del Carrito Modal
-  const cartHeader = document.querySelector(".cart-header");
-  if (cartHeader && ap.colorPrincipal) {
-    cartHeader.style.backgroundColor = ap.colorPrincipal;
-  }
-
-  if (cartHeader && ap.colorHeaderTexto) {
-    const cartElements = cartHeader.querySelectorAll("h3, .close-btn");
-    cartElements.forEach(el => el.style.color = ap.colorHeaderTexto);
+    if (cartHeader && configApariencia.colorHeaderTexto) {
+      const cartElements = cartHeader.querySelectorAll("h3, .close-btn");
+      cartElements.forEach(el => el.style.color = configApariencia.colorHeaderTexto);
+    }
   }
 }
 
