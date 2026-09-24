@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catálogo Digital</title>
+  <link rel="stylesheet" href="estilos.css">
+</head>
+
+<body>
+
+  <!-- SDK de Facebook con Carga Asíncrona Diferida (Evita que el navegador se quede girando) -->
+  <div id="fb-root"></div>
+  <script>
+    window.addEventListener('load', function () {
+      var js = document.createElement('script');
+      js.id = 'facebook-jssdk';
+      js.src = "https://connect.facebook.net/es_LA/sdk.js#xfbml=1&version=v18.0";
+      js.async = true;
+      js.defer = true;
+      js.crossOrigin = "anonymous";
+      document.body.appendChild(js);
+    });
+  </script>
+
+  <!-- Encabezado con Buscador y Carrito -->
+  <header class="header">
+    <div class="header-container">
+
+      <!-- Contenedor del buscador y filtros -->
+      <div class="controles-busqueda" style="display: flex; gap: 8px; flex: 1; max-width: 600px;">
+        <!-- Buscador en tiempo real -->
+        <input type="text" id="buscador" placeholder="Buscar productos, marcas y más..." style="flex: 1;">
+
+        <!-- NUEVO: Selector de Ordenamiento por Precio -->
+        <select id="orden-precio"
+          style="padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-size: 0.9rem; background: #fff; cursor: pointer;">
+          <option value="defecto">Ordenar por...</option>
+          <option value="menor-mayor">Menor a mayor precio</option>
+          <option value="mayor-menor">Mayor a menor precio</option>
+          <option value="ofertas">Solo ofertas 🏷️</option>
+        </select>
+      </div>
+
+      <!-- Botón para abrir el carrito -->
+      <div class="carrito-icon" title="Ver carrito">
+        🛒 <span id="cart-count">0</span>
+      </div>
+    </div>
+
+    <!-- Menú Dinámico de Categorías con Logo al Lado Izquierdo -->
+    <nav class="categories-nav">
+      <div class="categories-wrapper">
+
+        <!-- LOGO UBICADO AL LADO IZQUIERDO DE LAS CATEGORÍAS -->
+        <a href="index.html" class="logo-link" title="Ir al inicio">
+          <div class="logo-wrapper">
+            <img src="img/logo.png" alt="Mi Catálogo" class="logo-img"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <span class="logo-text-fallback">Mi Catálogo</span>
+          </div>
+        </a>
+
+        <!-- MENÚ DE CATEGORÍAS -->
+        <div class="categories-container" id="categories-menu">
+          <!-- Generado dinámicamente desde JS -->
+        </div>
+
+      </div>
+    </nav>
+  </header>
+
+  <!-- Contenedor Principal -->
+  <main class="main-container">
+
+    <!-- Carrusel de Banners Promocionales -->
+    <section class="banner-carousel-wrapper">
+      <button class="banner-btn prev-banner" id="btn-prev-banner">&#10094;</button>
+
+      <div class="banner-carousel-container" id="banner-container">
+        <div class="banner-track" id="banner-track">
+          <!-- Banners Promocionales cargados dinámicamente -->
+        </div>
+      </div>
+
+      <button class="banner-btn next-banner" id="btn-next-banner">&#10095;</button>
+      <div class="banner-dots" id="banner-dots"></div>
+    </section>
+
+    <!-- Sección Principal de Productos -->
+    <h2 class="section-title" id="catalogo-titulo">Todos los productos</h2>
+    <div class="grid-productos" id="grid-productos">
+      <!-- Se carga dinámicamente desde productos.json / localStorage -->
+    </div>
+
+    <!-- Sección Redes Sociales y Videos -->
+    <section class="social-section">
+      <h2 class="section-title social-title-dark">Síguenos en Redes Sociales</h2>
+      <p class="social-subtitle social-subtitle-dark">Entérate de nuestras novedades, tutoriales y trabajos recientes
+      </p>
+
+      <div class="social-grid">
+        <!-- Tarjeta Facebook / Feed en vivo -->
+        <div class="social-card">
+          <div class="social-card-header facebook-bg">
+            <span class="social-icon">📘</span>
+            <h3>Facebook e Instagram</h3>
+          </div>
+          <div class="social-card-body fb-card-body">
+            <p style="margin-bottom: 10px; font-size: 0.9rem; padding: 0 16px;">Publicamos catálogo diario, muestras de
+              trabajos sublimados y promociones exclusivas.</p>
+
+            <!-- Muro / Plugin de Facebook -->
+            <div class="fb-plugin-wrapper" id="fb-container">
+              <div class="fb-page" data-href="https://www.facebook.com/facebook" data-tabs="timeline" data-width="500"
+                data-height="280" data-small-header="true" data-adapt-container-width="true" data-hide-cover="false"
+                data-show-facepile="false">
+                <blockquote cite="https://www.facebook.com/facebook" class="fb-xfbml-parse-ignore">
+                  <a href="https://www.facebook.com/facebook">Cargando Facebook...</a>
+                </blockquote>
+              </div>
+            </div>
+
+            <div class="social-buttons" style="margin-top: 12px; padding: 0 16px;">
+              <a href="https://facebook.com" target="_blank" class="btn-social btn-fb">Ver Facebook</a>
+              <a href="https://instagram.com" target="_blank" class="btn-social btn-ig">Ver Instagram</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reproductor de Video -->
+        <div class="social-card media-card">
+          <div class="social-card-header youtube-bg">
+            <span class="social-icon">🎬</span>
+            <h3>Video Destacado</h3>
+          </div>
+          <div class="social-card-body video-card-body">
+            <div class="video-container">
+              <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Video de productos" frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen>
+              </iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sección Visto Recientemente -->
+    <section class="section-vistos" id="section-vistos" style="display: none;">
+      <h2 class="section-title">Visto recientemente</h2>
+      <div class="carousel-wrapper">
+        <button class="carousel-btn prev-btn" id="btn-prev-vistos">&#10094;</button>
+
+        <div class="carousel-container" id="carousel-vistos">
+          <div class="grid-vistos" id="grid-vistos">
+            <!-- Tarjetas generadas dinámicamente -->
+          </div>
+        </div>
+
+        <button class="carousel-btn next-btn" id="btn-next-vistos">&#10095;</button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Pie de Página (Footer) -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-col">
+        <h3>Mi Catálogo</h3>
+        <p id="direccion-tienda">Holcá, Yucatán, México</p>
+        <p>Ventas de mayoreo y menudeo con envíos y entregas coordinadas directamente por WhatsApp.</p>
+      </div>
+
+      <div class="footer-col">
+        <h3>Redes Sociales</h3>
+        <ul class="footer-links">
+          <li><a href="https://facebook.com" target="_blank" class="btn-fb">Facebook</a></li>
+          <li><a href="https://instagram.com" target="_blank" class="btn-ig">Instagram</a></li>
+          <li><a href="https://wa.me/529990000000" target="_blank">WhatsApp Directo</a></li>
+        </ul>
+      </div>
+
+      <!-- NUEVA COLUMNA PARA MOSTRAR EL MAPA EN VIVO -->
+      <div class="footer-col" id="columna-mapa" style="display: none;">
+        <h3>Ubicación</h3>
+        <div style="width: 100%; height: 160px; border-radius: 8px; overflow: hidden; margin-top: 8px;">
+          <iframe id="mapa-iframe" src="" width="100%" height="100%" style="border:0;" allowfullscreen=""
+            loading="lazy"></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; 2026 Mi Catálogo Digital - Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <!-- Modal Lateral del Carrito -->
+  <div id="cart-modal" class="cart-modal">
+    <div class="cart-content">
+      <div class="cart-header">
+        <h3>Tu Pedido</h3>
+        <button id="close-cart" class="close-btn">&times;</button>
+      </div>
+
+      <div id="cart-items" class="cart-items">
+        <p class="empty-msg">El carrito está vacío.</p>
+      </div>
+
+      <div class="cart-footer">
+        <div class="total-row">
+          <span>Total Estimado:</span>
+          <span id="cart-total" class="total-price">$0</span>
+        </div>
+        <button id="btn-whatsapp" class="btn-whatsapp" disabled>
+          Enviar pedido por WhatsApp 📲
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+
+</html>
